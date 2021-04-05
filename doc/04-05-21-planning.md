@@ -75,3 +75,4 @@ else:
   * This might get spicy; likely going to require a full port.
 * How quantum is this going to be?
   * See the above. Very quantum. Honestly just getting this implemented is ambitious enough.
+* Wait for Marc to emerge from under 308/350 rock before he starts contributing actively to this repo :))))))
