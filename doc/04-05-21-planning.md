@@ -49,7 +49,7 @@ for bell_pair in bell_pairs:
     | / \ |
     |/   \|
     o-----o
-    
+
     Ex. 2: The "less-classic" quantum battleship map
     o-----o
     |     |
@@ -74,4 +74,4 @@ else:
 * Get this sucker compatible with QISKit
   * This might get spicy; likely going to require a full port.
 * How quantum is this going to be?
-  * Quantum logic gates will be used to handle the interaction between shots and
+  * See the above. Very quantum. Honestly just getting this implemented is ambitious enough.
