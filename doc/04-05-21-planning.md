@@ -13,6 +13,10 @@
     * Currently uses the Hadamard Gate and the CNOT to create Bell Pairs
     * However many bell pairs are in the 1 state are how much health you have; 0 state is how much damage you've taken.
       * i.e.) If 76/100 bell pairs are in the 0 state, then you have "76%" health
+  * Bomb candidates
+    * We could use the RY gate to throw off the basis
+      * Could be dangerous; would add to the amount of "weather" that the qbits experience and potentially prematurely collapse the wavefunction.
+    * 
 
 Pseudocode is as follows:
 
