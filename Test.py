@@ -7,10 +7,6 @@ Player = 0
 Ship1Health = 200
 Ship2Health = 200
 
-# list to hide ship in
-map1 = [0,0,0,0,0]
-map2 = [0,0,0,0,0]
-
 # can change the turns later if needed
 maxTurns = 4
 # turn iterator
@@ -25,13 +21,19 @@ class Board:
     
     boardArt = ""
     isHit = []
+    mapPos = []
 
     def __init__(self):
         self.boardArt = "1o----2o\n |\   /|\n | \ / |\n | 3o  |\n | / \ |\n |/   \|\n4o----5o"
         self.isHit = [False, False, False, False, False]
+        self.mapPos = [0,0,0,0,0]
     
     def DrawBoard(self):
          print(self.boardArt)
+
+    def HideShip(self, locationRequest):
+        location = int(locationRequest) - 1
+        self.mapPos[location] = 1
     
     # really bad way of changing characters, can change later
     def ChangeBoard(self, locationStr):
@@ -74,14 +76,14 @@ board1.DrawBoard()
 print("Player one, hide your ship")
 hideLocation = input("Choose location to hide: ")
 
-map1[int(hideLocation) - 1] = 1
+board1.HideShip(hideLocation)
 
 board2.DrawBoard()
 
 print("Player two, hide your ship")
 hideLocation = input("Choose location to hide: ")
 
-map2[int(hideLocation) - 1] = 1
+board2.HideShip(hideLocation)
 
 while(turn < maxTurns):
 
@@ -93,7 +95,7 @@ while(turn < maxTurns):
 
     board2.ChangeBoard(shotLocation)
 
-    if map2[int(shotLocation) - 1] == 1:
+    if board2.mapPos[int(shotLocation) - 1] == 1:
         if weaponChoice == "Turret":
             Ship2Health -= Weapon.Turret.value
         elif weaponChoice == "Torpedo":
@@ -115,7 +117,7 @@ while(turn < maxTurns):
 
     board1.ChangeBoard(shotLocation)
 
-    if map1[int(shotLocation) - 1] == 1:
+    if board1.mapPos[int(shotLocation) - 1] == 1:
         if weaponChoice == "Turret":
             Ship1Health -= Weapon.Turret.value
         elif weaponChoice == "Torpedo":
