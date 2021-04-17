@@ -1,22 +1,33 @@
 from enum import Enum
+import qiskit
+from qiskit import QuantumCircuit, execute, Aer
 import os
+import random
+import time
 
 # the current player (either 0 or 1)
 Player = 0
 
+# initialize randomizer seed
+random.seed(time.monotonic())
+
 # initialize ship health (will change when quantum circuits are implemented)
-Ship1Health = 200
-Ship2Health = 200
+Ship1Health = [0,0,0,0,0]
+Ship2Health = [0,0,0,0,0]
 
 # can change the turns later if needed
 maxTurns = 4
 # turn iterator
 turn = 0
 
-class Weapon(Enum):
-    turret = 20
-    torpedo = 50
-    tacticle_nuke = 200
+# initialize quantum circuits for use in each round
+healthQCsArray = []
+
+for i in range(0,maxTurns):
+    healthQCsArray.append(QuantumCircuit(10,10))
+
+# initialize backend
+backend = Aer.get_backend('qasm_simulator')
 
 class Board:
     
@@ -63,6 +74,24 @@ def SwitchPlayer(player):
     else:
         return 0
 
+
+def getHealth(qcResults):
+    memory = results.data()
+    hexDeci = memory['counts']
+    for key, value in hexDeci.items():
+        testHex = key
+    
+    hexAsInt = int(testHex, 16)
+    hexAsBin = bin(hexAsInt)
+    trueBin = hexAsBin[2:]
+    largestIndex = len(trueBin)
+
+    shipHealth = [0,0,0,0,0,0,0,0,0,0]
+
+    for i in range(0,largestIndex):
+        shipHealth[i] = int(trueBin[largestIndex - 1 - i])
+
+    return shipHealth
 
 
 # initialize boards
@@ -114,6 +143,21 @@ while isHiddenP2 == False:
 
 # main game loop
 while turn < maxTurns:
+
+    # update ship health
+    j = 0
+    for i in Ship1Health:
+        if i == 1:
+            healthQCsArray[turn].x(j)
+        
+        j += 1
+
+    for k in Ship2Health:
+        if i == 1:
+            healthQCsArray[turn].x(j)
+
+        j += 1
+
     # initialize input checks
     hasChosenShotLocationP1 = False
     hasChosenShotLocationP2 = False
@@ -140,14 +184,14 @@ while turn < maxTurns:
             print("Must give numeric selection")
 
     while hasChosenWeaponP1 == False:
-        weaponChoice = input("Choose your weapon (weapons: Turret, Torpedo, Tacticle_Nuke): ")
+        weaponChoice = input("Choose your weapon (weapons: Shell, Jammer, Health_Steal): ")
 
         #check if input is valid
-        if weaponChoice.lower() == "turret":
+        if weaponChoice.lower() == "shell":
             hasChosenWeaponP1 = True
-        elif weaponChoice.lower() == "torpedo":
+        elif weaponChoice.lower() == "jammer":
             hasChosenWeaponP1 = True
-        elif weaponChoice.lower() == "tacticle_nuke":
+        elif weaponChoice.lower() == "health_steal":
             hasChosenWeaponP1 = True
         else:
             print("Must choose a valid weapon")
@@ -155,12 +199,16 @@ while turn < maxTurns:
     board2.ChangeBoard(shotLocation)
 
     if board2.mapPos[int(shotLocation) - 1] == 1:
-        if weaponChoice == "turret":
-            Ship2Health -= Weapon.turret.value
-        elif weaponChoice == "torpedo":
-            Ship2Health -= Weapon.torpedo.value
-        elif weaponChoice == "tacticle_tuke":
-            Ship2Health -= Weapon.tacticle_nuke.value
+        # Player 2's ship health qubits are 5-9
+        shipSectionHit = random.randint(5, 9)
+
+        if weaponChoice == "shell":
+            healthQCsArray[turn].x(shipSectionHit)
+        elif weaponChoice == "jammer":
+            healthQCsArray[turn].h(shipSectionHit)
+        elif weaponChoice == "health_steal":
+            # TODO implement health steal using teleportation
+            healthQCsArray[turn].x(shipSectionHit)
     else:
         print("Target missed")
 
@@ -185,14 +233,14 @@ while turn < maxTurns:
             print("Must give numeric selection")
 
     while hasChosenWeaponP2 == False:
-        weaponChoice = input("Choose your weapon (weapons: Turret, Torpedo, Tacticle_Nuke): ")
+        weaponChoice = input("Choose your weapon (weapons: Shell, Jammer, Health_Steal): ")
 
         #check if input is valid
-        if weaponChoice.lower() == "turret":
+        if weaponChoice.lower() == "shell":
             hasChosenWeaponP2 = True
-        elif weaponChoice.lower() == "torpedo":
+        elif weaponChoice.lower() == "jammer":
             hasChosenWeaponP2 = True
-        elif weaponChoice.lower() == "tacticle_nuke":
+        elif weaponChoice.lower() == "health_steal":
             hasChosenWeaponP2 = True
         else:
             print("Must choose a valid weapon")
@@ -200,14 +248,29 @@ while turn < maxTurns:
     board1.ChangeBoard(shotLocation)
 
     if board1.mapPos[int(shotLocation) - 1] == 1:
-        if weaponChoice == "turret":
-            Ship1Health -= Weapon.turret.value
-        elif weaponChoice == "torpedo":
-            Ship1Health -= Weapon.torpedo.value
-        elif weaponChoice == "tacticle_nuke":
-            Ship1Health -= Weapon.tacticle_nuke.value
+        # Player 1's ship health qubits are 0-4
+        shipSectionHit = random.randint(0, 4)
+
+        if weaponChoice == "shell":
+            healthQCsArray[turn].x(shipSectionHit)
+        elif weaponChoice == "jammer":
+            healthQCsArray[turn].h(shipSectionHit)
+        elif weaponChoice == "health_steal":
+            # TODO implement health steal using teleportation
+            healthQCsArray[turn].x(shipSectionHit)
     else:
         print("Target missed")
+
+    
+    # Calculate this round's quantum circuit results
+    healthQCsArray[turn].measure(range(0,10),range(0,10))
+
+    endRoundResults = execute(healthQCsArray[turn], backend=backend, shots=1).result()
+
+    endRoundHealth = getHealth(endRoundResults)
+
+    Ship1Health = endRoundHealth[0:5]
+    Ship2Health = endRoundHealth[5:10]
 
     Player = SwitchPlayer(Player)
 
