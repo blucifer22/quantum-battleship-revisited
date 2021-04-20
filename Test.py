@@ -24,7 +24,7 @@ turn = 0
 healthQCsArray = []
 
 for i in range(0,maxTurns):
-    healthQCsArray.append(QuantumCircuit(10,10))
+    healthQCsArray.append(QuantumCircuit(12,12))
 
 # initialize backend
 backend = Aer.get_backend('qasm_simulator')
@@ -76,7 +76,7 @@ def SwitchPlayer(player):
 
 
 def getHealth(qcResults):
-    memory = results.data()
+    memory = qcResults.data()
     hexDeci = memory['counts']
     for key, value in hexDeci.items():
         testHex = key
@@ -261,6 +261,38 @@ while turn < maxTurns:
     else:
         print("Target missed")
 
+# sneaky spy action at 2nd to last turn
+    if turn == maxTurns -2:
+        infiltrationPortP1 = random.randint(0, 2)
+        infiltrationPortP2 = random.randint(5, 7)
+
+        receivingPortP1 = random.randint(3, 4)
+        receivingPortP1 = random.randint(8, 9)
+
+        spy1 = 10
+        spy2 = 11
+
+        healthQCsArray[turn].h(spy1)
+        healthQCsArray[turn].h(spy2)
+
+        healthQCsArray[turn].cx(spy1, receivingPortP1)
+        healthQCsArray[turn].cx(spy2, receivingPortP2)
+
+        healthQCsArray[turn].cx(infiltrationPortP1, spy2)
+        healthQCsArray[turn].cx(infiltrationPortP2, spy1)
+
+        healthQCsArray[turn].measure(infiltrationPortP1, infiltrationPortP1)
+        healthQCsArray[turn].measure(infiltrationPortP2, infiltrationPortP2)
+        healthQCsArray[turn].measure(spy1, spy1)
+        healthQCsArray[turn].measure(spy2, spy2)
+
+        healthQCsArray[turn].x(receivingPortP1).c_if(spy1, 1)
+        healthQCsArray[turn].z(receivingPortP1).c_if(infiltrationPortP2, 1)
+
+        healthQCsArray[turn].x(receivingPortP2).c_if(spy2, 1)
+        healthQCsArray[turn].z(receivingPortP2).c_if(infiltrationPortP1, 1)
+
+
     
     # Calculate this round's quantum circuit results
     healthQCsArray[turn].measure(range(0,10),range(0,10))
@@ -275,6 +307,25 @@ while turn < maxTurns:
     Player = SwitchPlayer(Player)
 
     turn += 1
+
+pointsP1 = 0
+pointsP2 = 0
+
+for part in Ship1Health:
+    if part == 0:
+        pointsP1 += 1
+
+for part in Ship2Health:
+    if part == 0:
+        pointsP2 += 1
+
+
+if pointsP1 > pointsP2:
+    print("Player one wins!!!")
+elif pointsP2 > pointsP1:
+    print("Player two wins!!!")
+else:
+    print("You both have failed to escape death")
 
 print(Ship1Health)
 print(Ship2Health)
