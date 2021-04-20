@@ -24,7 +24,7 @@ turn = 0
 healthQCsArray = []
 
 for i in range(0,maxTurns):
-    healthQCsArray.append(QuantumCircuit(12,12))
+    healthQCsArray.append(QuantumCircuit(10,10))
 
 # initialize backend
 backend = Aer.get_backend('qasm_simulator')
@@ -132,7 +132,7 @@ while isHiddenP2 == False:
 
     if hideLocation.isnumeric():
         if int(hideLocation) < 5:
-            board1.HideShip(hideLocation)
+            board2.HideShip(hideLocation)
             isHiddenP2 = True
         else:
             os.system("clear")
@@ -173,7 +173,7 @@ while turn < maxTurns:
         shotLocation = input("Choose a location to strike: ")
 
         # check if input is valid
-        if shotLocation.isnumeric:
+        if shotLocation.isnumeric():
             if int(shotLocation) <= 5:
                 hasChosenShotLocationP1 = True
             else:
@@ -200,7 +200,24 @@ while turn < maxTurns:
 
     if board2.mapPos[int(shotLocation) - 1] == 1:
         # Player 2's ship health qubits are 5-9
+        hasChosenSection = False
+
+        while hasChosenSection == False:
+            sectionSelection = input("Choose section of ship to hit (1 - 5): ")
+            print(sectionSelection.isnumeric())
+
+            if sectionSelection.isnumeric():
+                if int(sectionSelection) < 6:
+                    if int(sectionSelection) > 0:
+                        shipSectionHit = int(sectionSelection) + 4
+                        hasChosenSection = True
+                else:
+                    print("Choose valid section (1-5)")
+
+
         shipSectionHit = random.randint(5, 9)
+
+        print("Ship hit")
 
         if weaponChoice == "shell":
             healthQCsArray[turn].x(shipSectionHit)
@@ -222,7 +239,7 @@ while turn < maxTurns:
         shotLocation = input("Choose a location to strike: ")
 
         # check if input is valid
-        if shotLocation.isnumeric:
+        if shotLocation.isnumeric():
             if int(shotLocation) <= 5:
                 hasChosenShotLocationP2 = True
             else:
@@ -249,7 +266,21 @@ while turn < maxTurns:
 
     if board1.mapPos[int(shotLocation) - 1] == 1:
         # Player 1's ship health qubits are 0-4
-        shipSectionHit = random.randint(0, 4)
+        hasChosenSection = False
+
+        while hasChosenSection == False:
+            sectionSelection = input("Choose section of ship to hit (1 - 5): ")
+            print(sectionSelection.isnumeric())
+
+            if sectionSelection.isnumeric():
+                if int(sectionSelection) < 6:
+                    if int(sectionSelection) > 0:
+                        shipSectionHit = int(sectionSelection) - 1
+                        hasChosenSection = True
+                else:
+                    print("Choose valid section (1-5)")
+
+        print("Ship hit")
 
         if weaponChoice == "shell":
             healthQCsArray[turn].x(shipSectionHit)
@@ -262,35 +293,35 @@ while turn < maxTurns:
         print("Target missed")
 
 # sneaky spy action at 2nd to last turn
-    if turn == maxTurns -2:
-        infiltrationPortP1 = random.randint(0, 2)
-        infiltrationPortP2 = random.randint(5, 7)
+    # if turn == maxTurns -2:
+    #     infiltrationPortP1 = random.randint(0, 2)
+    #     infiltrationPortP2 = random.randint(5, 7)
 
-        receivingPortP1 = random.randint(3, 4)
-        receivingPortP1 = random.randint(8, 9)
+    #     receivingPortP1 = random.randint(3, 4)
+    #     receivingPortP1 = random.randint(8, 9)
 
-        spy1 = 10
-        spy2 = 11
+    #     spy1 = 10
+    #     spy2 = 11
 
-        healthQCsArray[turn].h(spy1)
-        healthQCsArray[turn].h(spy2)
+    #     healthQCsArray[turn].h(spy1)
+    #     healthQCsArray[turn].h(spy2)
 
-        healthQCsArray[turn].cx(spy1, receivingPortP1)
-        healthQCsArray[turn].cx(spy2, receivingPortP2)
+    #     healthQCsArray[turn].cx(spy1, receivingPortP1)
+    #     healthQCsArray[turn].cx(spy2, receivingPortP2)
 
-        healthQCsArray[turn].cx(infiltrationPortP1, spy2)
-        healthQCsArray[turn].cx(infiltrationPortP2, spy1)
+    #     healthQCsArray[turn].cx(infiltrationPortP1, spy2)
+    #     healthQCsArray[turn].cx(infiltrationPortP2, spy1)
 
-        healthQCsArray[turn].measure(infiltrationPortP1, infiltrationPortP1)
-        healthQCsArray[turn].measure(infiltrationPortP2, infiltrationPortP2)
-        healthQCsArray[turn].measure(spy1, spy1)
-        healthQCsArray[turn].measure(spy2, spy2)
+    #     healthQCsArray[turn].measure(infiltrationPortP1, infiltrationPortP1)
+    #     healthQCsArray[turn].measure(infiltrationPortP2, infiltrationPortP2)
+    #     healthQCsArray[turn].measure(spy1, spy1)
+    #     healthQCsArray[turn].measure(spy2, spy2)
 
-        healthQCsArray[turn].x(receivingPortP1).c_if(spy1, 1)
-        healthQCsArray[turn].z(receivingPortP1).c_if(infiltrationPortP2, 1)
+    #     healthQCsArray[turn].x(receivingPortP1).c_if(spy1, 1)
+    #     healthQCsArray[turn].z(receivingPortP1).c_if(infiltrationPortP2, 1)
 
-        healthQCsArray[turn].x(receivingPortP2).c_if(spy2, 1)
-        healthQCsArray[turn].z(receivingPortP2).c_if(infiltrationPortP1, 1)
+    #     healthQCsArray[turn].x(receivingPortP2).c_if(spy2, 1)
+    #     healthQCsArray[turn].z(receivingPortP2).c_if(infiltrationPortP1, 1)
 
 
     
