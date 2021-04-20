@@ -8,7 +8,7 @@ Juan Lasso Velasco Duke '21 (ME)
 
 ## How to Play
 
-Open up the `prototype_game_loop` notebook and press play in the "Functional" cell. Grab a friend and follow the on-screen prompts to select a weapon and fight for fame, glory, and bragging rights about how the qbits like you more.
+Open up the `quantum_battleship_revisited` notebook and press run-all. Grab a friend and follow the on-screen prompts to select a weapon and fight for fame, glory, and bragging rights about how the qbits like you more.
 
 More information about the implementation the specific weapons is in the presentation linked below.
 
